@@ -6,3 +6,5 @@ gunicorn==20.1.0
 gevent==21.8.0
 gevent-websocket==0.10.1
 redis==4.3.4
+python-dotenv==0.19.1
+eventlet==0.30.2

@@ -7,8 +7,6 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from statistics import mean
 import redis
 import json
-import eventlet
-eventlet.monkey_patch()
 
 load_dotenv()
 
@@ -18,7 +16,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24)
 redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 redis_client = redis.Redis.from_url(redis_url)
 
-socketio = SocketIO(app, async_mode='eventlet', message_queue=redis_url)
+socketio = SocketIO(app, async_mode='eventlet')
 
 rooms_key = "rooms" 
 

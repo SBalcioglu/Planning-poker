@@ -5,7 +5,7 @@ import uuid
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from statistics import mean
-import redis
+from redis import Redis
 import json
 
 load_dotenv()
@@ -14,7 +14,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24)
 
 redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
-redis_client = redis.Redis.from_url(redis_url)
+try:
+    redis_client = Redis.from_url(redis_url)
+    redis_client.ping()  
+except ConnectionError:
+    print("Warning: Could not connect to Redis. Using in-memory storage instead.")
+    redis_client = None
+
+if redis_client:
+    redis_client.set(room_id, json.dumps(room_data))
+else:
+    in_memory_storage[room_id] = room_data
 
 socketio = SocketIO(app, async_mode='eventlet')
 

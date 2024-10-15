@@ -13,7 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24)
 
-redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+redis_url = os.environ.get('REDIS_URL')
 try:
     redis_client = Redis.from_url(redis_url)
     redis_client.ping()  
@@ -21,10 +21,7 @@ except ConnectionError:
     print("Warning: Could not connect to Redis. Using in-memory storage instead.")
     redis_client = None
 
-if redis_client:
-    redis_client.set(room_id, json.dumps(room_data))
-else:
-    in_memory_storage[room_id] = room_data
+in_memory_storage = {}
 
 socketio = SocketIO(app, async_mode='eventlet')
 
@@ -157,6 +154,7 @@ def on_disconnect():
                 emit('user_left', {'name': name}, room=room_id)
                 emit('update_users', {'users': list(room_data['users'].values())}, room=room_id)
                 break
+            
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

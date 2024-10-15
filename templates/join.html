@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Planning Poker Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='join.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="join-container">
+        <h1>Join Planning Poker Room</h1>
+        <p>Room ID: {{ room }}</p>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form id="join-room-form" method="POST" action="{{ url_for('room', room_id=room) }}">
+            <input type="text" name="name" id="name" placeholder="Enter your name" required>
+            <button type="submit">Join Room</button>
+        </form>
+    </div>
+</body>
+</html>

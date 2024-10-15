@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Poker Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='room.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="room-info">
+        <span id="room-id">Room ID: {{ room }}</span>
+        <h1>Planning Poker Room</h1>
+        <button id="invite-btn" class="button">Invite Players</button>
+    </div>
+
+    <div class="table-area">
+        <div class="poker-table">
+            <div class="user-cards"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="reveal-btn" class="button">Reveal Votes</button>
+        <button id="reset-btn" class="button">Reset Votes</button>
+    </div>
+
+    <div class="cards">
+        <div class="card vote-btn" data-value="0">0</div>
+        <div class="card vote-btn" data-value="1">1</div>
+        <div class="card vote-btn" data-value="2">2</div>
+        <div class="card vote-btn" data-value="3">3</div>
+        <div class="card vote-btn" data-value="5">5</div>
+        <div class="card vote-btn" data-value="8">8</div>
+        <div class="card vote-btn" data-value="13">13</div>
+        <div class="card vote-btn" data-value="21">21</div>
+        <div class="card vote-btn" data-value="34">34</div>
+        <div class="card vote-btn" data-value="55">55</div>
+        <div class="card vote-btn" data-value="89">89</div>
+        <div class="card vote-btn" data-value="?">?</div>
+        <div class="card vote-btn" data-value="coffee">☕</div>
+    </div>
+
+    <div id="results-container">
+        <div id="results"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const socket = io();
+            const room = '{{ room }}';
+            const name = '{{ name }}';
+
+            socket.on('connect', function() {
+                socket.emit('join', {room: room, name: name});
+            });
+
+            socket.on('user_joined', function(data) {
+                console.log(data.name + ' joined the room');
+            });
+
+            socket.on('update_users', function(data) {
+                updateUserDisplay(data.users);
+            });
+
+            function updateUserDisplay(users) {
+                $('.user-cards').empty();
+                const totalUsers = users.length;
+                const tableWidth = $('.poker-table').width();
+                const tableHeight = $('.poker-table').height();
+                
+                users.forEach(function(user, index) {
+                    const angle = (index / totalUsers) * 2 * Math.PI;
+                    const radius = Math.min(tableWidth, tableHeight) / 2;
+                    const left = 50 + (radius - 30) * Math.cos(angle);
+                    const top = 50 + (radius - 45) * Math.sin(angle);
+
+                    const userCard = $(`
+                        <div class="user-card">
+                            <div class="card-back"></div>
+                            <div class="user-name">${user}</div>
+                        </div>
+                    `);
+                    userCard.css({
+                        left: left + '%',
+                        top: top + '%',
+                        transform: 'translate(-50%, -50%)'
+                    });
+                    $('.user-cards').append(userCard);
+                });
+            }
+
+            socket.on('vote_update', function(data) {
+                const userCard = $('.user-cards').find(`.user-card:contains("${data.name}")`);
+                if (data.vote === null) {
+                    userCard.removeClass('voted');
+                } else {
+                    userCard.addClass('voted');
+                }
+            });
+
+            socket.on('votes_revealed', function(data) {
+                $('#results').empty();
+                for (let [name, vote] of Object.entries(data.votes)) {
+                    $('#results').append('<p>' + name + ': ' + (vote || '-') + '</p>');
+                }
+                $('#results').append('<strong>Average: ' + data.average + '</strong>');
+                $('#results-container').show();
+            });
+            
+            socket.on('votes_reset', function() {
+                $('#results').empty();
+                $('#results-container').hide();
+                $('.user-card').removeClass('voted');
+                $('.vote-btn').removeClass('selected');
+            });
+
+            $('.vote-btn').click(function() {
+                const vote = $(this).data('value');
+                socket.emit('vote', {room: room, vote: vote});
+                $('.vote-btn').removeClass('selected');
+                $(this).addClass('selected');
+            });
+
+            $('#reveal-btn').click(function() {
+                socket.emit('reveal_votes', {room: room});
+            });
+
+            $('#reset-btn').click(function() {
+                socket.emit('reset_votes', {room: room});
+            });
+
+            $('#invite-btn').click(function() {
+                const inviteLink = `${window.location.origin}/room/${room}`;
+                navigator.clipboard.writeText(inviteLink).then(() => {
+                    alert('Invite link copied to clipboard!');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

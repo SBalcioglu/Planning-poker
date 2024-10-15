@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Poker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Planning Poker</h1>
+        <form id="create-room-form">
+            <input type="text" id="name" placeholder="Enter your name" required>
+            <button type="submit">Create Room</button>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#create-room-form').submit(function(e) {
+                e.preventDefault();
+                $.post('/create_room', {name: $('#name').val()}, function(data) {
+                    window.location.href = '/room/' + data.room;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

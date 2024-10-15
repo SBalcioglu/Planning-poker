@@ -1,3 +1,116 @@
+# Virtual Environment
 venv/
-*.pyc
+ENV/
+env/
+.venv/
+.env/
+
+# Python Cache Files
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer Logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit Test / Coverage Reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Flask Stuff
+instance/
+.webassets-cache/
+
+# Scrapy Stuff
+.scrapy/
+
+# Sphinx Documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Spyder Project Settings
+.spyderproject
+.spyproject
+
+# Rope Project Settings
+.ropeproject/
+
+# mkdocs Documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# VS Code Settings
+.vscode/
+
+# PyCharm Settings
+.idea/
+
+# macOS Specific Files
+.DS_Store
+
+# Windows Specific Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# SQLite Database (if used)
+*.sqlite3
+
+# Secrets (if any)
+*.env
+secrets.json

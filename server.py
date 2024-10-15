@@ -1,5 +1,6 @@
 # server.py
 import os
+from dotenv import load_dotenv
 import uuid
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -8,6 +9,8 @@ import redis
 import json
 import eventlet
 eventlet.monkey_patch()
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24)

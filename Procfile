@@ -1,1 +1,1 @@
-web: gunicorn server:app -k eventlet --log-file -
+web: gunicorn server:app -k gevent --log-file -

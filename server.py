@@ -13,15 +13,12 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24)
 
-redis_url = os.environ.get('REDIS_URL')
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 try:
     redis_client = Redis.from_url(redis_url)
-    redis_client.ping()  
+    redis_client.ping() 
 except ConnectionError:
-    print("Warning: Could not connect to Redis. Using in-memory storage instead.")
-    redis_client = None
-
-in_memory_storage = {}
+    print("Warning: Could not connect to Redis.")
 
 socketio = SocketIO(app, async_mode='eventlet')
 
@@ -126,7 +123,7 @@ def on_reveal_votes(data):
     if room_data:
         room_data = json.loads(room_data)
         votes = room_data.get('votes', {})
-        numeric_votes = [int(v) for v in votes.values() if v.isdigit()]
+        numeric_votes = [int(v) for v in votes.values() if isinstance(v, (int, str)) and str(v).isdigit()]
         average = round(mean(numeric_votes), 2) if numeric_votes else 0
         emit('votes_revealed', {'votes': votes, 'average': average}, room=room_id)
 
@@ -157,4 +154,4 @@ def on_disconnect():
             
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, host='0.0.0.0')
